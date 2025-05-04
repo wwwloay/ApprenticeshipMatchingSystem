@@ -32,7 +32,9 @@ class MatchingSystem:
                     CommercialRegisterNumber TEXT UNIQUE,
                     NumberOfEmployees INTEGER,
                     Location TEXT,
-                    TelephoneNumber TEXT
+                    TelephoneNumber TEXT,
+                    Email TEXT UNIQUE,  -- Ensure Email column exists
+                    Password TEXT       -- Ensure Password column exists
                 )
             """)
             self.cursor.execute("""
@@ -55,7 +57,8 @@ class MatchingSystem:
                     GPA REAL NOT NULL,
                     Specialization TEXT NOT NULL,
                     Skills TEXT NOT NULL,
-                    PreferredLocations TEXT NOT NULL
+                    PreferredLocations TEXT NOT NULL,
+                    Password TEXT NOT NULL  -- Ensure Password column exists
                 )
             """)
             self.conn.commit()
@@ -160,3 +163,38 @@ class MatchingSystem:
     def get_student_by_id(self, student_id):
         self.cursor.execute("SELECT * FROM Students WHERE StudentId = ?", (student_id,))
         return self.cursor.fetchone()
+    
+    def get_company_by_email(self, email):
+        self.cursor.execute("SELECT * FROM Companies WHERE Email = ?", (email,))
+        row = self.cursor.fetchone()
+        if row:
+            return {
+                "CompanyId": row[0],
+                "CompanyName": row[1],
+                "Type": row[2],
+                "Specialty": row[3],
+                "CommercialRegisterNumber": row[4],
+                "NumberOfEmployees": row[5],
+                "Location": row[6],
+                "TelephoneNumber": row[7],
+                "Email": row[8],
+                "Password": row[9]
+            }
+        return None
+    
+    def get_student_by_email(self, email):
+        self.cursor.execute("SELECT * FROM Students WHERE Email = ?", (email,))
+        row = self.cursor.fetchone()
+        if row:
+            return {
+                "StudentId": row[0],
+                "Name": row[1],
+                "MobileNumber": row[2],
+                "Email": row[3],
+                "GPA": row[4],
+                "Specialization": row[5],
+                "Skills": row[6],
+                "PreferredLocations": row[7],
+                "Password": row[8]
+            }
+        return None

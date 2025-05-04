@@ -175,7 +175,23 @@ class LoginWindow(QWidget):
             return
 
                 # Proceed with login logic
-        QMessageBox.information(self, "Success", f"{self.user_type} login successful!")
+        # QMessageBox.information(self, "Success", f"{self.user_type} login successful!")
+
+        if self.user_type == "Company":
+            company = self.matching_system.get_company_by_email(email)
+            if company and company["email"]==email and company["Password"] == password:
+                QMessageBox.information(self, "Success", "Company login successful!")
+                self.show_company_dashboard()
+            else:
+                QMessageBox.warning(self, "Error", "Wrong company email or password.")
+
+        elif self.user_type == "Student":
+            student = self.matching_system.get_student_by_email(email)
+            if student and student["email"]==email and student["Password"] == password:
+                QMessageBox.information(self, "Success", "Student login successful!")
+                self.show_student_dashboard()
+            else:
+                QMessageBox.warning(self, "Error", "Wrong student email or password.")
 
     def signup(self):
         data = {key: input_field.text() for key, input_field in self.inputs.items()}
