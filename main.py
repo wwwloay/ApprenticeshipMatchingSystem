@@ -62,17 +62,17 @@ class MainWindow(QMainWindow):
 
     def show_login_window(self):
         sender = self.sender()
-        user_type = "Company" if sender == self.company_button else "Student"
-        self.login_window = LoginWindow(user_type, self.matching_system)
+        user_kind = "Company" if sender == self.company_button else "Student"
+        self.login_window = LoginWindow(user_kind, self.matching_system)
         self.login_window.show()
 
 
 class LoginWindow(QWidget):
-    def __init__(self, user_type, matching_system):
+    def __init__(self, user_kind, matching_system):
         super().__init__()
-        self.user_type = user_type
+        self.user_kind = user_kind
         self.matching_system = matching_system
-        self.setWindowTitle(f"{user_type} Login/Sign Up")
+        self.setWindowTitle(f"{user_kind} Login/Sign Up")
         self.setGeometry(200, 200, 400, 300)
 
         # Main layout
@@ -99,8 +99,8 @@ class LoginWindow(QWidget):
         self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
-        layout.addRow("Email:", self.email_input)
-        layout.addRow("Password:", self.password_input)
+        layout.addRow("email:", self.email_input)
+        layout.addRow("password:", self.password_input)
 
         self.login_button = QPushButton("Login")
         self.login_button.clicked.connect(self.login)
@@ -113,15 +113,15 @@ class LoginWindow(QWidget):
 
         self.inputs = {}
         fields = {
-            "Company": ["CompanyName", "Type", "CommercialRegisterNumber", "NumberOfEmployees", "Location", "TelephoneNumber"],
-            "Student": ["Name", "MobileNumber", "StudentId", "GPA", "PreferredLocations", "Skills"]
+            "Company": ["company_name", "kind", "commercial_register_number", "number_of_employees", "location", "telephone_number"],
+            "Student": ["name", "mobile_number", "student_id", "GPA", "preferred_locations", "skills"]
         }
 
-        for field in fields[self.user_type]:
+        for field in fields[self.user_kind]:
             self.inputs[field] = QLineEdit()
             layout.addRow(field, self.inputs[field])
 
-        if self.user_type == "Student":
+        if self.user_kind == "Student":
                 self.specialization_dropdown = QComboBox()
                 self.specialization_dropdown.addItems([
                     "Computer Science",
@@ -132,9 +132,9 @@ class LoginWindow(QWidget):
                     "Arts",
                     "Other"
                ])
-                layout.addRow("Specialization", self.specialization_dropdown)
+                layout.addRow("specialization", self.specialization_dropdown)
 
-        elif self.user_type == "Company":
+        elif self.user_kind == "Company":
             self.specialty_dropdown = QComboBox()
             self.specialty_dropdown.addItems([
                     "Computer Science",
@@ -145,16 +145,16 @@ class LoginWindow(QWidget):
                     "Arts",
                     "Other"
             ])
-            layout.addRow("Specialty", self.specialty_dropdown)
+            layout.addRow("specialty", self.specialty_dropdown)
 
 
-        # Add Email and Password fields for Sign-Up
+        # Add email and password fields for Sign-Up
         self.email_input_signup = QLineEdit()
         self.password_input_signup = QLineEdit()
         self.password_input_signup.setEchoMode(QLineEdit.EchoMode.Password)
 
-        layout.addRow("Email:", self.email_input_signup)
-        layout.addRow("Password:", self.password_input_signup)
+        layout.addRow("email:", self.email_input_signup)
+        layout.addRow("password:", self.password_input_signup)
 
         self.signup_button = QPushButton("Sign Up")
         self.signup_button.clicked.connect(self.signup)
@@ -167,7 +167,7 @@ class LoginWindow(QWidget):
         password = self.password_input.text()
 
         if not self.is_valid_email(email):
-            QMessageBox.warning(self, "Invalid Email", "Please enter a valid email address.")
+            QMessageBox.warning(self, "Invalid email", "Please enter a valid email address.")
             return
 
         if not email or not password:
@@ -175,17 +175,17 @@ class LoginWindow(QWidget):
             return
 
                 # Proceed with login logic
-        # QMessageBox.information(self, "Success", f"{self.user_type} login successful!")
+        # QMessageBox.information(self, "Success", f"{self.user_kind} login successful!")
 
-        if self.user_type == "Company":
+        if self.user_kind == "Company":
             company = self.matching_system.get_company_by_email(email)
-            if company and company["Email"]==email and company["Password"] == password:
+            if company and company["email"]==email and company["password"] == password:
                 QMessageBox.information(self, "Success", "Company login successful!")
                 self.show_company_dashboard()
             else:
                 QMessageBox.warning(self, "Error", "Wrong company email or password.")
 
-        elif self.user_type == "Student":
+        elif self.user_kind == "Student":
             student = self.matching_system.get_student_by_email(email)
             if student and student["email"]==email and student["password"] == password:
                 QMessageBox.information(self, "Success", "Student login successful!")
@@ -198,27 +198,27 @@ class LoginWindow(QWidget):
         email = self.email_input_signup.text()
         password = self.password_input_signup.text()
         
-        data["Email"] = email
-        data["Password"] = password
+        data["email"] = email
+        data["password"] = password
         
-        if self.user_type == "Student":
-            data["Specialization"] = self.specialization_dropdown.currentText()
-        elif self.user_type == "Company":
+        if self.user_kind == "Student":
+            data["specialization"] = self.specialization_dropdown.currentText()
+        elif self.user_kind == "Company":
             if hasattr(self, "specialty_dropdown"):  # Check if the dropdown exists
-                data["Specialty"] = self.specialty_dropdown.currentText()
+                data["specialty"] = self.specialty_dropdown.currentText()
             else:
-                QMessageBox.warning(self, "Error", "Specialty dropdown is not initialized.")
+                QMessageBox.warning(self, "Error", "specialty dropdown is not initialized.")
                 return
 
         if not self.is_valid_email(email):
-            QMessageBox.warning(self, "Invalid Email", "Please enter a valid email address.")
+            QMessageBox.warning(self, "Invalid email", "Please enter a valid email address.")
             return
 
         if any(not value for value in data.values()) or not email or not password:
             QMessageBox.warning(self, "Error", "Please fill in all fields.")
             return
 
-        if self.user_type == "Student":
+        if self.user_kind == "Student":
             try:
                 gpa = float(data["GPA"])
                 if gpa < 0 or gpa > 5:
@@ -227,12 +227,12 @@ class LoginWindow(QWidget):
                 QMessageBox.warning(self, "Invalid GPA", "GPA must be a number between 0 and 5.")
                 return
         
-            phone_number = data["MobileNumber"]
+            phone_number = data["mobile_number"]
             if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
                 QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
                 return
 
-            student_id = data["StudentId"]
+            student_id = data["student_id"]
             if not student_id.isdigit() or len(student_id) != 7 or not (1500000 <= int(student_id) <= 2699999):
                 QMessageBox.warning(self, "Invalid Student ID", "Student ID must be exactly 7 digits and between 1500000 and 2699999.")
                 return
@@ -242,50 +242,50 @@ class LoginWindow(QWidget):
                 QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already registered.")
                 return
 
-        if self.user_type == "Company":
-            phone_number = data["TelephoneNumber"]
+        if self.user_kind == "Company":
+            phone_number = data["telephone_number"]
             if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
                 QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
                 return
 
-        # Validate CommercialRegisterNumber
-            commercial_register_number = data["CommercialRegisterNumber"]
+        # Validate commercial_register_number
+            commercial_register_number = data["commercial_register_number"]
             if not commercial_register_number.isdigit():
                 QMessageBox.warning(self, "Invalid Commercial Register Number", "Commercial Register Number must contain only numbers.")
                 return
 
-            number_of_employees = data["NumberOfEmployees"]
+            number_of_employees = data["number_of_employees"]
             if not number_of_employees.isdigit():
                 QMessageBox.warning(self, "Invalid Number of Employees", "Number of Employees must contain only numbers.")
                 return
 
 
             company = Company(
-                CompanyId=None,
-                CompanyName=data["CompanyName"],
-                Type=data["Type"],
-                Specialty=data["Specialty"],
-                CommercialRegisterNumber=data["CommercialRegisterNumber"],
-                NumberOfEmployees=data["NumberOfEmployees"],
-                Location=data["Location"],
-                TelephoneNumber=data["TelephoneNumber"],
-                Email= data["Email"],  # Pass the email
-                Password=data["Password"]
+                company_id=None,
+                company_name=data["company_name"],
+                kind=data["kind"],
+                specialty=data["specialty"],
+                commercial_register_number=data["commercial_register_number"],
+                number_of_employees=data["number_of_employees"],
+                location=data["location"],
+                telephone_number=data["telephone_number"],
+                email= data["email"],  # Pass the email
+                password=data["password"]
             )
             self.matching_system.add_company(company)
             QMessageBox.information(self, "Success", "Company registered successfully!")
     
-        elif self.user_type == "Student":
+        elif self.user_kind == "Student":
             student = Student(
-                name=data["Name"],
-                mobile_number=data["MobileNumber"],
-                Email=data["Email"],
-                password=data["Password"],
-                student_id=data["StudentId"],
+                name=data["name"],
+                mobile_number=data["mobile_number"],
+                email=data["email"],
+                password=data["password"],
+                student_id=data["student_id"],
                 gpa=float(data["GPA"]),
-                specialization=data["Specialization"],
-                skills=data["Skills"].split(","),
-                preferred_locations=data["PreferredLocations"].split(",")
+                specialization=data["specialization"],
+                skills=data["skills"].split(","),
+                preferred_locations=data["preferred_locations"].split(",")
             )
             self.matching_system.add_student(student)
             QMessageBox.information(self, "Success", "Student registered successfully!")
@@ -341,7 +341,7 @@ class StudentDashboard(QWidget):
 
 
 if __name__ == "__main__":
-    def handle_exception(exc_type, exc_value, exc_traceback):
+    def handle_exception(exc_kind, exc_value, exc_traceback):
         error_message = f"An unexpected error occurred:\n{exc_value}"
         QMessageBox.critical(None, "Error", error_message)
 

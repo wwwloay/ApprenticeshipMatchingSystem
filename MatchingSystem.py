@@ -25,40 +25,40 @@ class MatchingSystem:
         try:
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Companies (
-                    CompanyId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CompanyName TEXT NOT NULL,
-                    Type TEXT,
-                    Specialty TEXT,
-                    CommercialRegisterNumber TEXT UNIQUE,
-                    NumberOfEmployees INTEGER,
-                    Location TEXT,
-                    TelephoneNumber TEXT,
-                    Email TEXT UNIQUE,  -- Ensure Email column exists
-                    Password TEXT       -- Ensure Password column exists
+                    company_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    company_name TEXT NOT NULL,
+                    kind TEXT,
+                    specialty TEXT,
+                    commercial_register_number TEXT UNIQUE,
+                    number_of_employees INTEGER,
+                    location TEXT,
+                    telephone_number TEXT,
+                    email TEXT UNIQUE,  -- Ensure email column exists
+                    password TEXT       -- Ensure password column exists
                 )
             """)
             self.cursor.execute("""
-                CREATE TABLE IF NOT EXISTS Openings (
+                CREATE TABLE IF NOT EXISTS openings (
                     OpeningId INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CompanyId INTEGER,
-                    Specialization TEXT NOT NULL,
-                    Location TEXT NOT NULL,
+                    company_id INTEGER,
+                    specialization TEXT NOT NULL,
+                    location TEXT NOT NULL,
                     Stipend REAL NOT NULL,
                     RequiredSkills TEXT NOT NULL,
-                    FOREIGN KEY (CompanyId) REFERENCES Companies(CompanyId)
+                    FOREIGN KEY (company_id) REFERENCES Companies(company_id)
                 )
             """)
             self.cursor.execute("""
                 CREATE TABLE IF NOT EXISTS Students (
-                    StudentId TEXT PRIMARY KEY,
-                    Name TEXT NOT NULL,
-                    MobileNumber TEXT NOT NULL,
-                    Email TEXT NOT NULL,
-                    Password TEXT NOT NULL,
-                    GPA REAL NOT NULL,
-                    Specialization TEXT NOT NULL,
-                    Skills TEXT NOT NULL,
-                    PreferredLocations TEXT NOT NULL
+                    student_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    mobile_number TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    password TEXT NOT NULL,
+                    gpa REAL NOT NULL,
+                    specialization TEXT NOT NULL,
+                    skills TEXT NOT NULL,
+                    preferred_locations TEXT NOT NULL
                 )
             """)
             self.conn.commit()
@@ -70,17 +70,17 @@ class MatchingSystem:
 
             self.cursor.execute("""
                 INSERT INTO Companies (
-                    CompanyName, Type, Specialty, CommercialRegisterNumber,
-                    NumberOfEmployees, Location, TelephoneNumber,
-                    Email,
-                    Password
+                    company_name, kind, specialty, commercial_register_number,
+                    number_of_employees, location, telephone_number,
+                    email,
+                    password
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                company.CompanyName, company.Type, company.Specialty,
-                company.CommercialRegisterNumber, company.NumberOfEmployees,
-                company.Location, company.TelephoneNumber,
-                company.Email,  # Include the email
-                company.Password  # Include the password
+                company.company_name, company.kind, company.specialty,
+                company.commercial_register_number, company.number_of_employees,
+                company.location, company.telephone_number,
+                company.email,  # Include the email
+                company.password  # Include the password
             ))
             self.conn.commit()
             print("Company added successfully!")  # Debug confirmation
@@ -95,7 +95,7 @@ class MatchingSystem:
                 raise ValueError("Stipend must be a positive number.")
 
             self.cursor.execute("""
-                INSERT INTO Openings (CompanyId, Specialization, Location, Stipend, RequiredSkills)
+                INSERT INTO openings (company_id, specialization, location, Stipend, RequiredSkills)
                 VALUES (?, ?, ?, ?, ?)
             """, (
                 company_id, opening.specialization, opening.location,
@@ -110,13 +110,13 @@ class MatchingSystem:
 
     def add_student(self, student):
         try:
-            # Validate GPA between 0 and 5
+            # Validate gpa between 0 and 5
             if not (0 <= student.gpa <= 5):
-                raise ValueError("GPA must be between 0 and 5.")
+                raise ValueError("gpa must be between 0 and 5.")
 
             self.cursor.execute("""
                 INSERT INTO Students (
-                    StudentId, Name, MobileNumber, Email, Password, GPA, Specialization, Skills, PreferredLocations
+                    student_id, name, mobile_number, email, password, gpa, specialization, skills, preferred_locations
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 student.student_id, student.name, student.mobile_number, student.email, student.password,
@@ -132,7 +132,7 @@ class MatchingSystem:
     def match_students_to_openings(self):
         try:
             # Fetch all openings and students
-            self.cursor.execute("SELECT * FROM Openings")
+            self.cursor.execute("SELECT * FROM openings")
             openings = self.cursor.fetchall()
 
             self.cursor.execute("SELECT * FROM Students")
@@ -154,55 +154,55 @@ class MatchingSystem:
                         if not required_skills.isdisjoint(skills):
                             matches.append({
                                 "StudentName": name,
-                                "GPA": gpa,
+                                "gpa": gpa,
                                 "OpeningSpecialization": specialization,
-                                "Location": location,
+                                "location": location,
                                 "Stipend": stipend
                             })
 
-            # Sort matches by GPA (descending)
-            matches.sort(key=lambda x: x["GPA"], reverse=True)
+            # Sort matches by gpa (descending)
+            matches.sort(key=lambda x: x["gpa"], reverse=True)
             return matches
         except sqlite3.Error as e:
             print(f"Error matching students to openings: {e}")
             return []
     
     def get_student_by_id(self, student_id):
-        self.cursor.execute("SELECT * FROM Students WHERE StudentId = ?", (student_id,))
+        self.cursor.execute("SELECT * FROM Students WHERE student_id = ?", (student_id,))
         return self.cursor.fetchone()
     
     def get_company_by_email(self, email):
-        self.cursor.execute("SELECT * FROM Companies WHERE Email = ?", (email,))
+        self.cursor.execute("SELECT * FROM Companies WHERE email = ?", (email,))
         row = self.cursor.fetchone()
         print(row)  # Debugging line to check the fetched row
         if row:
             return {
-                "CompanyId": row[0],
-                "CompanyName": row[1],
-                "Type": row[2],
-                "Specialty": row[3],
-                "CommercialRegisterNumber": row[4],
-                "NumberOfEmployees": row[5],
-                "Location": row[6],
-                "TelephoneNumber": row[7],
-                "Email": row[8],
-                "Password": row[9]
+                "company_id": row[0],
+                "company_name": row[1],
+                "kind": row[2],
+                "specialty": row[3],
+                "commercial_register_number": row[4],
+                "number_of_employees": row[5],
+                "location": row[6],
+                "telephone_number": row[7],
+                "email": row[8],
+                "password": row[9]
             }
         return None
     
     def get_student_by_email(self, email):
-        self.cursor.execute("SELECT * FROM Students WHERE Email = ?", (email,))
+        self.cursor.execute("SELECT * FROM Students WHERE email = ?", (email,))
         row = self.cursor.fetchone()
         if row:
             return {
-                "StudentId": row[0],
-                "Name": row[1],
-                "MobileNumber": row[2],
-                "Email": row[3],
-                "Password": row[4],
-                "GPA": row[5],
-                "Specialization": row[6],
-                "Skills": row[7],
-                "PreferredLocations": row[8]
+                "student_id": row[0],
+                "name": row[1],
+                "mobile_number": row[2],
+                "email": row[3],
+                "password": row[4],
+                "gpa": row[5],
+                "specialization": row[6],
+                "skills": row[7],
+                "preferred_locations": row[8]
             }
         return None
