@@ -208,15 +208,20 @@ class LoginWindow(QWidget):
                 QMessageBox.warning(self, "Invalid GPA", "GPA must be a number between 0 and 5.")
                 return
         
-        phone_number = data["MobileNumber"]
-        if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
-            QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
-            return
+            phone_number = data["MobileNumber"]
+            if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
+                QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
+                return
 
-        student_id = data["StudentId"]
-        if not student_id.isdigit() or len(student_id) != 7 or not (1500000 <= int(student_id) <= 2699999):
-            QMessageBox.warning(self, "Invalid Student ID", "Student ID must be exactly 7 digits and between 1500000 and 2699999.")
-            return
+            student_id = data["StudentId"]
+            if not student_id.isdigit() or len(student_id) != 7 or not (1500000 <= int(student_id) <= 2699999):
+                QMessageBox.warning(self, "Invalid Student ID", "Student ID must be exactly 7 digits and between 1500000 and 2699999.")
+                return
+
+            existing_student = self.matching_system.get_student_by_id(student_id)
+            if existing_student:
+                QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already registered.")
+                return
 
 
         if self.user_type == "Company":

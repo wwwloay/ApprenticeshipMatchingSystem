@@ -156,3 +156,7 @@ class MatchingSystem:
         except sqlite3.Error as e:
             print(f"Error matching students to openings: {e}")
             return []
+    
+    def get_student_by_id(self, student_id):
+        self.cursor.execute("SELECT * FROM Students WHERE StudentId = ?", (student_id,))
+        return self.cursor.fetchone()
