@@ -179,7 +179,7 @@ class LoginWindow(QWidget):
 
         if self.user_type == "Company":
             company = self.matching_system.get_company_by_email(email)
-            if company and company["email"]==email and company["Password"] == password:
+            if company and company["Email"]==email and company["Password"] == password:
                 QMessageBox.information(self, "Success", "Company login successful!")
                 self.show_company_dashboard()
             else:
@@ -187,7 +187,7 @@ class LoginWindow(QWidget):
 
         elif self.user_type == "Student":
             student = self.matching_system.get_student_by_email(email)
-            if student and student["email"]==email and student["Password"] == password:
+            if student and student["email"]==email and student["password"] == password:
                 QMessageBox.information(self, "Success", "Student login successful!")
                 self.show_student_dashboard()
             else:
@@ -197,6 +197,9 @@ class LoginWindow(QWidget):
         data = {key: input_field.text() for key, input_field in self.inputs.items()}
         email = self.email_input_signup.text()
         password = self.password_input_signup.text()
+        
+        data["Email"] = email
+        data["Password"] = password
         
         if self.user_type == "Student":
             data["Specialization"] = self.specialization_dropdown.currentText()
@@ -265,7 +268,9 @@ class LoginWindow(QWidget):
                 CommercialRegisterNumber=data["CommercialRegisterNumber"],
                 NumberOfEmployees=data["NumberOfEmployees"],
                 Location=data["Location"],
-                TelephoneNumber=data["TelephoneNumber"]
+                TelephoneNumber=data["TelephoneNumber"],
+                Email= data["Email"],  # Pass the email
+                Password=data["Password"]
             )
             self.matching_system.add_company(company)
             QMessageBox.information(self, "Success", "Company registered successfully!")
@@ -274,7 +279,8 @@ class LoginWindow(QWidget):
             student = Student(
                 name=data["Name"],
                 mobile_number=data["MobileNumber"],
-                email=email,
+                Email=data["Email"],
+                password=data["Password"],
                 student_id=data["StudentId"],
                 gpa=float(data["GPA"]),
                 specialization=data["Specialization"],

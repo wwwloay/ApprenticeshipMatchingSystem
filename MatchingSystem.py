@@ -54,11 +54,11 @@ class MatchingSystem:
                     Name TEXT NOT NULL,
                     MobileNumber TEXT NOT NULL,
                     Email TEXT NOT NULL,
+                    Password TEXT NOT NULL,
                     GPA REAL NOT NULL,
                     Specialization TEXT NOT NULL,
                     Skills TEXT NOT NULL,
-                    PreferredLocations TEXT NOT NULL,
-                    Password TEXT NOT NULL  -- Ensure Password column exists
+                    PreferredLocations TEXT NOT NULL
                 )
             """)
             self.conn.commit()
@@ -67,17 +67,24 @@ class MatchingSystem:
 
     def add_company(self, company):
         try:
+
             self.cursor.execute("""
                 INSERT INTO Companies (
                     CompanyName, Type, Specialty, CommercialRegisterNumber,
-                    NumberOfEmployees, Location, TelephoneNumber
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    NumberOfEmployees, Location, TelephoneNumber,
+                    Email,
+                    Password
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 company.CompanyName, company.Type, company.Specialty,
                 company.CommercialRegisterNumber, company.NumberOfEmployees,
-                company.Location, company.TelephoneNumber
+                company.Location, company.TelephoneNumber,
+                company.Email,  # Include the email
+                company.Password  # Include the password
             ))
             self.conn.commit()
+            print("Company added successfully!")  # Debug confirmation
+
         except sqlite3.Error as e:
             print(f"Error adding company: {e}")
 
@@ -109,10 +116,10 @@ class MatchingSystem:
 
             self.cursor.execute("""
                 INSERT INTO Students (
-                    StudentId, Name, MobileNumber, Email, GPA, Specialization, Skills, PreferredLocations
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    StudentId, Name, MobileNumber, Email, Password, GPA, Specialization, Skills, PreferredLocations
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
-                student.student_id, student.name, student.mobile_number, student.email,
+                student.student_id, student.name, student.mobile_number, student.email, student.password,
                 student.gpa, student.specialization, ",".join(student.skills),
                 ",".join(student.preferred_locations)
             ))
@@ -167,6 +174,7 @@ class MatchingSystem:
     def get_company_by_email(self, email):
         self.cursor.execute("SELECT * FROM Companies WHERE Email = ?", (email,))
         row = self.cursor.fetchone()
+        print(row)  # Debugging line to check the fetched row
         if row:
             return {
                 "CompanyId": row[0],
@@ -191,10 +199,10 @@ class MatchingSystem:
                 "Name": row[1],
                 "MobileNumber": row[2],
                 "Email": row[3],
-                "GPA": row[4],
-                "Specialization": row[5],
-                "Skills": row[6],
-                "PreferredLocations": row[7],
-                "Password": row[8]
+                "Password": row[4],
+                "GPA": row[5],
+                "Specialization": row[6],
+                "Skills": row[7],
+                "PreferredLocations": row[8]
             }
         return None
