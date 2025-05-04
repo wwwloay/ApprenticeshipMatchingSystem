@@ -5,7 +5,8 @@ from PyQt6.QtGui import QFont
 from Company import Company
 from Student import Student
 from MatchingSystem import MatchingSystem
-
+import re
+from PyQt6.QtWidgets import QComboBox
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -112,13 +113,40 @@ class LoginWindow(QWidget):
 
         self.inputs = {}
         fields = {
-            "Company": ["CompanyName", "Type", "Specialty", "CommercialRegisterNumber", "NumberOfEmployees", "Location", "TelephoneNumber"],
-            "Student": ["Name", "MobileNumber", "StudentId", "GPA", "Specialization", "PreferredLocations", "Skills"]
+            "Company": ["CompanyName", "Type", "CommercialRegisterNumber", "NumberOfEmployees", "Location", "TelephoneNumber"],
+            "Student": ["Name", "MobileNumber", "StudentId", "GPA", "PreferredLocations", "Skills"]
         }
 
         for field in fields[self.user_type]:
             self.inputs[field] = QLineEdit()
             layout.addRow(field, self.inputs[field])
+
+        if self.user_type == "Student":
+                self.specialization_dropdown = QComboBox()
+                self.specialization_dropdown.addItems([
+                    "Computer Science",
+                    "Engineering",
+                    "Business Administration",
+                    "Medicine",
+                    "Law",
+                    "Arts",
+                    "Other"
+               ])
+                layout.addRow("Specialization", self.specialization_dropdown)
+
+        elif self.user_type == "Company":
+            self.specialty_dropdown = QComboBox()
+            self.specialty_dropdown.addItems([
+                    "Computer Science",
+                    "Engineering",
+                    "Business Administration",
+                    "Medicine",
+                    "Law",
+                    "Arts",
+                    "Other"
+            ])
+            layout.addRow("Specialty", self.specialty_dropdown)
+
 
         # Add Email and Password fields for Sign-Up
         self.email_input_signup = QLineEdit()
@@ -138,20 +166,34 @@ class LoginWindow(QWidget):
         email = self.email_input.text()
         password = self.password_input.text()
 
-        if not email or not password:
-            QMessageBox.warning(self, "Error", "Please fill in all fields.")
+        if not self.is_valid_email(email):
+            QMessageBox.warning(self, "Invalid Email", "Please enter a valid email address.")
             return
 
+        if not email or not password:
+            QMessageBox.warning(self, "Missing Fields", "Please fill in all fields.")
+            return
+
+                # Proceed with login logic
         QMessageBox.information(self, "Success", f"{self.user_type} login successful!")
-        if self.user_type == "Company":
-            self.show_company_dashboard()
-        elif self.user_type == "Student":
-            self.show_student_dashboard()
 
     def signup(self):
         data = {key: input_field.text() for key, input_field in self.inputs.items()}
         email = self.email_input_signup.text()
         password = self.password_input_signup.text()
+        
+        if self.user_type == "Student":
+            data["Specialization"] = self.specialization_dropdown.currentText()
+        elif self.user_type == "Company":
+            if hasattr(self, "specialty_dropdown"):  # Check if the dropdown exists
+                data["Specialty"] = self.specialty_dropdown.currentText()
+            else:
+                QMessageBox.warning(self, "Error", "Specialty dropdown is not initialized.")
+                return
+
+        if not self.is_valid_email(email):
+            QMessageBox.warning(self, "Invalid Email", "Please enter a valid email address.")
+            return
 
         if any(not value for value in data.values()) or not email or not password:
             QMessageBox.warning(self, "Error", "Please fill in all fields.")
@@ -170,7 +212,7 @@ class LoginWindow(QWidget):
             )
             self.matching_system.add_company(company)
             QMessageBox.information(self, "Success", "Company registered successfully!")
-
+    
         elif self.user_type == "Student":
             student = Student(
                 name=data["Name"],
@@ -186,7 +228,11 @@ class LoginWindow(QWidget):
             QMessageBox.information(self, "Success", "Student registered successfully!")
 
         self.close()
-
+    def is_valid_email(self, email):
+        # Regular expression to validate email format
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(email_regex, email) is not None
+    
     def show_company_dashboard(self):
         self.company_dashboard = CompanyDashboard(self.matching_system)
         self.company_dashboard.show()
