@@ -223,15 +223,31 @@ class LoginWindow(QWidget):
                 QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already registered.")
                 return
 
-
         if self.user_type == "Company":
+            phone_number = data["TelephoneNumber"]
+            if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
+                QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
+                return
+
+        # Validate CommercialRegisterNumber
+            commercial_register_number = data["CommercialRegisterNumber"]
+            if not commercial_register_number.isdigit():
+                QMessageBox.warning(self, "Invalid Commercial Register Number", "Commercial Register Number must contain only numbers.")
+                return
+
+            number_of_employees = data["NumberOfEmployees"]
+            if not number_of_employees.isdigit():
+                QMessageBox.warning(self, "Invalid Number of Employees", "Number of Employees must contain only numbers.")
+                return
+
+
             company = Company(
                 CompanyId=None,
                 CompanyName=data["CompanyName"],
                 Type=data["Type"],
                 Specialty=data["Specialty"],
                 CommercialRegisterNumber=data["CommercialRegisterNumber"],
-                NumberOfEmployees=int(data["NumberOfEmployees"]),
+                NumberOfEmployees=data["NumberOfEmployees"],
                 Location=data["Location"],
                 TelephoneNumber=data["TelephoneNumber"]
             )
