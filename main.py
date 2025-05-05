@@ -200,6 +200,10 @@ class LoginWindow(QWidget):
         
         data["email"] = email
         data["password"] = password
+
+        if len(password) < 8 or not password.isalnum():
+            QMessageBox.warning(self, "Invalid Password", "Password must be at least 8 characters long and alphanumeric.")
+            return
         
         if self.user_kind == "Student":
             data["specialization"] = self.specialization_dropdown.currentText()
@@ -224,7 +228,7 @@ class LoginWindow(QWidget):
                 if gpa < 0 or gpa > 5:
                     raise ValueError
             except ValueError:
-                QMessageBox.warning(self, "Invalid GPA", "GPA must be a number between 0 and 5.")
+                QMessageBox.warning(self, "Invalid GPA", "GPA must be between 0 and 5.")
                 return
         
             phone_number = data["mobile_number"]
@@ -239,7 +243,7 @@ class LoginWindow(QWidget):
 
             existing_student = self.matching_system.get_student_by_id(student_id)
             if existing_student:
-                QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already registered.")
+                QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already exists.")
                 return
 
         if self.user_kind == "Company":
