@@ -101,8 +101,8 @@ class LoginWindow(QWidget):
         self.password_input = QLineEdit()
         self.password_input.setEchoMode(QLineEdit.EchoMode.Password)
 
-        layout.addRow("email:", self.email_input)
-        layout.addRow("password:", self.password_input)
+        layout.addRow("Email:", self.email_input)
+        layout.addRow("Password:", self.password_input)
 
         self.login_button = QPushButton("Login")
         self.login_button.clicked.connect(self.login)
@@ -120,8 +120,10 @@ class LoginWindow(QWidget):
         }
 
         for field in fields[self.user_kind]:
+            # Capitalize the field label
+            field_label = " ".join(word.capitalize() for word in field.split("_"))
             self.inputs[field] = QLineEdit()
-            layout.addRow(field, self.inputs[field])
+            layout.addRow(f'{field_label}:', self.inputs[field])
 
         if self.user_kind == "Student":
                 self.specialization_dropdown = QComboBox()
@@ -134,7 +136,7 @@ class LoginWindow(QWidget):
                     "Arts",
                     "Other"
                ])
-                layout.addRow("specialization", self.specialization_dropdown)
+                layout.addRow("Specialization:", self.specialization_dropdown)
 
         elif self.user_kind == "Company":
             self.specialty_dropdown = QComboBox()
@@ -147,7 +149,7 @@ class LoginWindow(QWidget):
                     "Arts",
                     "Other"
             ])
-            layout.addRow("specialty", self.specialty_dropdown)
+            layout.addRow("Specialty:", self.specialty_dropdown)
 
 
         # Add email and password fields for Sign-Up
@@ -155,8 +157,8 @@ class LoginWindow(QWidget):
         self.password_input_signup = QLineEdit()
         self.password_input_signup.setEchoMode(QLineEdit.EchoMode.Password)
 
-        layout.addRow("email:", self.email_input_signup)
-        layout.addRow("password:", self.password_input_signup)
+        layout.addRow("Email:", self.email_input_signup)
+        layout.addRow("Password:", self.password_input_signup)
 
         self.signup_button = QPushButton("Sign Up")
         self.signup_button.clicked.connect(self.signup)
