@@ -180,7 +180,6 @@ class LoginWindow(QWidget):
             return
 
                 # Proceed with login logic
-        # QMessageBox.information(self, "Success", f"{self.user_kind} login successful!")
 
         if self.user_kind == "Company":
             company = self.matching_system.get_company_by_email(email)
@@ -366,66 +365,37 @@ class CompanyDashboard(QWidget):
         matches = self.get_matched_students()
         if matches:
             for match in matches:
-                self.layout.addWidget(QLabel(
+                # Create a new QLabel for each student
+                student_label = QLabel(
                     f"Name: {match['name']}, Email: {match['email']}, GPA: {match['gpa']}, "
                     f"Specialization: {match['specialization']}, Location: {match['location']}"
-                ))
+                )
+                self.layout.addWidget(student_label)  # Add the QLabel to the layout
         else:
             self.layout.addWidget(QLabel("No openings match your criteria."))
 
     def get_matched_students(self):
-        # Fetch the company by email
+    # Fetch the company by email
         company = self.matching_system.get_company_by_email(self.company_email)
         if not company:
             return []
 
-        # # Fetch all openings for the company
-        # company_id = company["company_id"]
-        # openings = self.matching_system.get_company_by_email(e)
-        # print("company:", 10*'-')
-
         # Fetch all students
         students = self.matching_system.get_all_students()
-        
-        # if settings["debug"]:
-        #     print("students:", 10*'-')
-        #     print(students)
 
-
-        # Match students to openings
+        # Match students to the company's specialization and location
         matches = []
         for student in students:
-            if company["specialty"] == student["specialization"]:
-                student_locations = student["preferred_locations"].split(",")
-                if company["location"] in student_locations:
+            if company["specialty"] == student["specialization"]:  # Match specialization
+                student_locations = [location.strip() for location in student["preferred_locations"].split(",")]
+                if company["location"] in student_locations:  # Match if any preferred location matches the company's location
                     matches.append({
                         "name": student["name"],
+                        "email": student["email"],
                         "gpa": student["gpa"],
                         "specialization": student["specialization"],
-                        "location": company["location"],
-                        "email": student["email"]
+                        "location": company["location"]
                     })
-
-
-        # for opening in openings:
-        #     opening_specialization = opening["specialization"]
-        #     opening_location = opening["location"]
-
-        #     for student in students:
-        #         student_specialization = student["specialization"]
-        #         student_locations = student["preferred_locations"].split(",")
-
-        #         # Check if specialization and location match
-        #         if (
-        #             opening_specialization == student_specialization and
-        #             opening_location in student_locations
-        #         ):
-        #             matches.append({
-        #                 "name": student["name"],
-        #                 "gpa": student["gpa"],
-        #                 "specialization": opening_specialization,
-        #                 "location": opening_location
-        #             })
 
         # Sort matches by GPA in descending order
         matches.sort(key=lambda x: x["gpa"], reverse=True)
@@ -456,4 +426,4 @@ if __name__ == "__main__":
     app.setStyle("Fusion")  # Modern style
     window = MainWindow()
     window.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec()),

@@ -222,8 +222,6 @@ class MatchingSystem:
             for row in rows
         ]
 
-
-
     def get_all_openings(self):
         self.cursor.execute("SELECT * FROM openings")
         rows = self.cursor.fetchall()
