@@ -200,11 +200,22 @@ class LoginWindow(QWidget):
         
         data["email"] = email
         data["password"] = password
-
+        
+        if self.user_kind == "Student":
+            existing_student = self.matching_system.get_student_by_email(email)
+            if existing_student:
+                QMessageBox.warning(self, "Error", "Account already exists.")
+                return
+        elif self.user_kind == "Company":
+            existing_company = self.matching_system.get_company_by_email(email)
+            if existing_company:
+                QMessageBox.warning(self, "Error", "Account already exists.")
+                return
+            
         if len(password) < 8 or not password.isalnum():
             QMessageBox.warning(self, "Invalid Password", "Password must be at least 8 characters long and alphanumeric.")
             return
-        
+            
         if self.user_kind == "Student":
             data["specialization"] = self.specialization_dropdown.currentText()
         elif self.user_kind == "Company":
