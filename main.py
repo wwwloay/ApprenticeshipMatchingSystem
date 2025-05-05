@@ -234,6 +234,12 @@ class LoginWindow(QWidget):
             return
 
         if self.user_kind == "Student":
+
+            preferred_locations = data["preferred_locations"].split(",")
+            if any(any(char.isdigit() for char in location.strip()) for location in preferred_locations):
+                QMessageBox.warning(self, "Invalid Preferred Locations", "Preferred locations must not contain numbers.")
+                return
+
             try:
                 gpa = float(data["GPA"])
                 if gpa < 0 or gpa > 5:
@@ -256,11 +262,28 @@ class LoginWindow(QWidget):
             if existing_student:
                 QMessageBox.warning(self, "Duplicate Student ID", f"The Student ID {student_id} is already exists.")
                 return
+            
+            skills = data["skills"].split(",")
+            if any(skill.strip().isdigit() for skill in skills):
+                QMessageBox.warning(self, "Invalid Skills", "Skills must not contain numbers.")
+                return
+            
+
 
         if self.user_kind == "Company":
             phone_number = data["telephone_number"]
             if not phone_number.isdigit() or len(phone_number) != 10 or not phone_number.startswith("05"):
                 QMessageBox.warning(self, "Invalid Phone Number", "Phone number must be exactly 10 digits and start with '05'.")
+                return
+
+            location = data["location"]
+            if any(char.isdigit() for char in location):
+                QMessageBox.warning(self, "Invalid Location", "Location must not contain numbers.")
+                return
+            
+            kind = data["kind"]
+            if any(char.isdigit() for char in kind):
+                QMessageBox.warning(self, "Invalid Kind", "Kind must not contain numbers.")
                 return
 
         # Validate commercial_register_number
