@@ -206,3 +206,53 @@ class MatchingSystem:
                 "preferred_locations": row[8]
             }
         return None
+
+    def get_openings_by_company_id(self, company_id):
+        self.cursor.execute("SELECT * FROM openings WHERE company_id = ?", (company_id,))
+        rows = self.cursor.fetchall()
+        return [
+            {
+                "opening_id": row[0],
+                "company_id": row[1],
+                "specialization": row[2],
+                "location": row[3],
+                "stipend": row[4],
+                "required_skills": row[5]
+            }
+            for row in rows
+        ]
+
+
+
+    def get_all_openings(self):
+        self.cursor.execute("SELECT * FROM openings")
+        rows = self.cursor.fetchall()
+        return [
+            {
+                "opening_id": row[0],
+                "company_id": row[1],
+                "specialization": row[2],
+                "location": row[3],
+                "stipend": row[4],
+                "required_skills": row[5]
+            }
+            for row in rows
+        ]
+
+    def get_all_students(self):
+        self.cursor.execute("SELECT * FROM Students")
+        rows = self.cursor.fetchall()
+        return [
+            {
+                "student_id": row[0],
+                "name": row[1],
+                "mobile_number": row[2],
+                "email": row[3],
+                "password": row[4],
+                "gpa": row[5],
+                "specialization": row[6],
+                "skills": row[7],
+                "preferred_locations": row[8]
+            }
+            for row in rows
+        ]

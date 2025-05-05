@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
 class LoginWindow(QWidget):
     def __init__(self, user_kind, matching_system):
         super().__init__()
+        self.user_email = None
         self.user_kind = user_kind
         self.matching_system = matching_system
         self.setWindowTitle(f"{user_kind} Login/Sign Up")
@@ -165,6 +166,7 @@ class LoginWindow(QWidget):
     def login(self):
         email = self.email_input.text()
         password = self.password_input.text()
+        self.user_email = email
 
         if not self.is_valid_email(email):
             QMessageBox.warning(self, "Invalid email", "Please enter a valid email address.")
@@ -335,7 +337,7 @@ class LoginWindow(QWidget):
         return re.match(email_regex, email) is not None
     
     def show_company_dashboard(self):
-        self.company_dashboard = CompanyDashboard(self.matching_system)
+        self.company_dashboard = CompanyDashboard(self.matching_system, self.user_email)
         self.company_dashboard.show()
 
     def show_student_dashboard(self):
@@ -344,25 +346,84 @@ class LoginWindow(QWidget):
 
 
 class CompanyDashboard(QWidget):
-    def __init__(self, matching_system):
+    def __init__(self, matching_system, company_email):
         super().__init__()
         self.matching_system = matching_system
+        self.company_email = company_email
         self.setWindowTitle("Company Dashboard")
-        self.setGeometry(200, 200, 400, 300)
+        self.setGeometry(200, 200, 600, 400)
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.label = QLabel("Matching Results:")
+        self.label = QLabel("Matched Students:")
         self.layout.addWidget(self.label)
 
-        matches = self.matching_system.match_students_to_openings()
+        # Fetch matched students
+        matches = self.get_matched_students()
         if matches:
             for match in matches:
-                self.layout.addWidget(QLabel(f"Student: {match['StudentName']}, GPA: {match['GPA']}"))
+                self.layout.addWidget(QLabel(
+                    f"Name: {match['name']}, GPA: {match['gpa']}, "
+                    f"Specialization: {match['specialization']}, Location: {match['location']}"
+                ))
         else:
-            self.layout.addWidget(QLabel("No matches found."))
+            self.layout.addWidget(QLabel("No openings match your criteria."))
 
+    def get_matched_students(self):
+        # Fetch the company by email
+        company = self.matching_system.get_company_by_email(self.company_email)
+        if not company:
+            return []
+
+        # # Fetch all openings for the company
+        # company_id = company["company_id"]
+        # openings = self.matching_system.get_company_by_email(e)
+        print("company:", 10*'-')
+
+        # Fetch all students
+        students = self.matching_system.get_all_students()
+        print("students:", 10*'-')
+        print(students)
+
+
+        # Match students to openings
+        matches = []
+        for student in students:
+            if company["specialty"] == student["specialization"]:
+                student_locations = student["preferred_locations"].split(",")
+                if company["location"] in student_locations:
+                    matches.append({
+                        "name": student["name"],
+                        "gpa": student["gpa"],
+                        "specialization": student["specialization"],
+                        "location": company["location"]
+                    })
+
+
+        # for opening in openings:
+        #     opening_specialization = opening["specialization"]
+        #     opening_location = opening["location"]
+
+        #     for student in students:
+        #         student_specialization = student["specialization"]
+        #         student_locations = student["preferred_locations"].split(",")
+
+        #         # Check if specialization and location match
+        #         if (
+        #             opening_specialization == student_specialization and
+        #             opening_location in student_locations
+        #         ):
+        #             matches.append({
+        #                 "name": student["name"],
+        #                 "gpa": student["gpa"],
+        #                 "specialization": opening_specialization,
+        #                 "location": opening_location
+        #             })
+
+        # Sort matches by GPA in descending order
+        matches.sort(key=lambda x: x["gpa"], reverse=True)
+        return matches
 
 class StudentDashboard(QWidget):
     def __init__(self, matching_system):
