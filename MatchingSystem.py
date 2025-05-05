@@ -174,7 +174,7 @@ class MatchingSystem:
     def get_company_by_email(self, email):
         self.cursor.execute("SELECT * FROM Companies WHERE email = ?", (email,))
         row = self.cursor.fetchone()
-        print(row)  # Debugging line to check the fetched row
+        # print(row)  # Debugging line to check the fetched row
         if row:
             return {
                 "company_id": row[0],

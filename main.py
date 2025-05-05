@@ -7,6 +7,7 @@ from Student import Student
 from MatchingSystem import MatchingSystem
 import re
 from PyQt6.QtWidgets import QComboBox
+# from config import settings
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -379,12 +380,14 @@ class CompanyDashboard(QWidget):
         # # Fetch all openings for the company
         # company_id = company["company_id"]
         # openings = self.matching_system.get_company_by_email(e)
-        print("company:", 10*'-')
+        # print("company:", 10*'-')
 
         # Fetch all students
         students = self.matching_system.get_all_students()
-        print("students:", 10*'-')
-        print(students)
+        
+        # if settings["debug"]:
+        #     print("students:", 10*'-')
+        #     print(students)
 
 
         # Match students to openings
