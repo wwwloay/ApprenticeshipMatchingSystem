@@ -367,7 +367,7 @@ class CompanyDashboard(QWidget):
         if matches:
             for match in matches:
                 self.layout.addWidget(QLabel(
-                    f"Name: {match['name']}, GPA: {match['gpa']}, "
+                    f"Name: {match['name']}, Email: {match['email']}, GPA: {match['gpa']}, "
                     f"Specialization: {match['specialization']}, Location: {match['location']}"
                 ))
         else:
@@ -402,7 +402,8 @@ class CompanyDashboard(QWidget):
                         "name": student["name"],
                         "gpa": student["gpa"],
                         "specialization": student["specialization"],
-                        "location": company["location"]
+                        "location": company["location"],
+                        "email": student["email"]
                     })
 
 
