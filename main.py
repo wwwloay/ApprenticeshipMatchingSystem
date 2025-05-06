@@ -223,11 +223,7 @@ class LoginWindow(QWidget):
         if self.user_kind == "Student":
             data["specialization"] = self.specialization_dropdown.currentText()
         elif self.user_kind == "Company":
-            if hasattr(self, "specialty_dropdown"):  # Check if the dropdown exists
-                data["specialty"] = self.specialty_dropdown.currentText()
-            else:
-                QMessageBox.warning(self, "Error", "specialty dropdown is not initialized.")
-                return
+            data["specialty"] = self.specialty_dropdown.currentText()
 
         if not self.is_valid_email(email):
             QMessageBox.warning(self, "Invalid email", "Please enter a valid email address.")
