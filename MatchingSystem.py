@@ -1,7 +1,6 @@
 import sqlite3
 from Company import Company
 from Student import Student
-from ApprenticeshipOpening import ApprenticeshipOpening
 
 
 class MatchingSystem:

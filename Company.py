@@ -10,8 +10,6 @@ class Company:
         self.telephone_number = telephone_number
         self.email = email
         self.password = password
-        self.openings = []
-        self.available_jobs = []  # Placeholder for associated apprenticeship openings
 
     def __repr__(self):
         return f"Company(name={self.company_name}, specialty={self.specialty}, location={self.location})"
